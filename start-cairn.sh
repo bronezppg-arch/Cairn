@@ -3,13 +3,15 @@
 # The supervisor owns the dispatcher — start/stop/restart it from the dashboard's
 # "Конфигуратор" (no need to touch the dispatcher process by hand).
 #
-#   ./start-cairn.sh                       # start with dispatch.yaml.kolya
+#   ./start-cairn.sh                       # start with dispatch.yaml
 #   ./start-cairn.sh dispatch.yaml.gpt     # start with a different config
 #   ./start-cairn.sh stop                  # stop server + supervisor (+ its dispatcher)
 #
 # Idempotent: re-running won't double-start anything.
 set -u
-cd /home/kali/CTF/Cairn || { echo "cannot cd to repo"; exit 1; }
+# resolve the repo dir from this script's own location, so it works on any machine
+REPO_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+cd "$REPO_DIR" || { echo "cannot cd to repo"; exit 1; }
 export PATH="$HOME/.local/bin:$PATH"
 mkdir -p logs
 
@@ -22,10 +24,11 @@ if [ "${1:-}" = "stop" ]; then
   exit 0
 fi
 
-CONFIG="${1:-dispatch.yaml.kolya}"
+CONFIG="${1:-dispatch.yaml}"
 if [ ! -f "$CONFIG" ]; then
   echo "config not found: $CONFIG"
-  echo "available: $(ls dispatch.yaml.* 2>/dev/null | tr '\n' ' ')"
+  echo "available: $(ls dispatch.yaml dispatch.yaml.* 2>/dev/null | tr '\n' ' ')"
+  echo "run ./install.sh first, or copy dispatch.example.yaml -> dispatch.yaml and add your keys"
   exit 1
 fi
 
