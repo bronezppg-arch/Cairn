@@ -15,6 +15,7 @@ class RunningTask:
     fact_count: int | None = None
     hint_count: int | None = None
     open_intent_count: int | None = None
+    started_at: float = 0.0  # time.monotonic() when submitted; for telemetry "elapsed"
 
 
 @dataclass(slots=True)
